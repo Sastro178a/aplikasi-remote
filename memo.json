@@ -1,0 +1,51 @@
+{
+  "role": "IT_MASTER",
+  "pcName": "Pc Sastro",
+  "groupName": "Master Server",
+  "localIp": "192.168.1.142",
+  "macAddress": "70:77:81:81:99:9d",
+  "port": 4545,
+  "pairCode": "LAB",
+  "assistant": {
+    "name": "S.A.S.T.R.O",
+    "acronym": "System Automated Signal & Tech Remote Operator"
+  },
+  "telegram": {
+    "botToken": "",
+    "adminId": 0
+  },
+  "ai": {
+    "provider": "gemini",
+    "apiKey": "OFFLINE_LAN"
+  },
+  "security": {
+    "pin": "1708",
+    "autoPinMirror": true,
+    "sessionMinutes": 30
+  },
+  "profile": {
+    "ownerName": "It",
+    "facts": []
+  },
+  "groups": [
+    "Grup 1",
+    "Grup 2"
+  ],
+  "clients": [
+    {
+      "pcName": "Pc Sastro",
+      "groupName": "Master Server",
+      "ip": "192.168.1.142",
+      "mac": "70:77:81:81:99:9d",
+      "port": 4545,
+      "online": true,
+      "lastSeen": 1793400438433
+    }
+  ],
+  "blockedDomains": [
+    "tiktok.com"
+  ],
+  "blockedApps": [],
+  "notes": [],
+  "schedules": []
+}

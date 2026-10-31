@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.S.T.R.O - Menerima File</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700;900&display=swap');
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: transparent; /* Transparan agar bisa jadi overlay jika dijalankan di electron/webview */
+            color: #fff; 
+            overflow: hidden; 
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel { 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px); 
+            border: 1px solid rgba(14, 165, 233, 0.4); 
+            box-shadow: 0 10px 50px 0 rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(14, 165, 233, 0.2); 
+        }
+
+        /* Waves Animation */
+        .wave-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            border-radius: inherit;
+            z-index: 0;
+            opacity: 0.3;
+        }
+        .wave {
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.4) 0%, transparent 60%);
+            animation: pulse-wave 4s linear infinite alternate;
+        }
+        
+        @keyframes pulse-wave {
+            0% { transform: scale(0.8) translateY(10%); opacity: 0.2; }
+            100% { transform: scale(1.2) translateY(-10%); opacity: 0.6; }
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(56, 189, 248, 0.8);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 1);
+            animation: scan 2s linear infinite;
+            z-index: 2;
+        }
+        
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-black/50 backdrop-blur-sm">
+
+    <div class="glass-panel p-8 rounded-3xl w-[90%] max-w-lg relative z-10 transform transition-all shadow-[0_0_40px_rgba(14,165,233,0.3)]">
+        
+        <!-- Efek Background Latar Dalam Panel -->
+        <div class="wave-container"><div class="wave"></div></div>
+        
+        <!-- Header -->
+        <div class="relative z-10 flex items-center justify-between mb-8 border-b border-sky-500/30 pb-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-sky-900 border-2 border-sky-400 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)] animate-pulse">
+                    <i class="fa-solid fa-satellite-dish text-sky-300 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-sky-400 tracking-wider">INCOMING TRANSFER</h2>
+                    <p class="text-xs text-gray-400">Secure LAN Connection: Port 4545</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-lock text-emerald-400 text-xl" title="Encrypted Connection"></i>
+        </div>
+
+        <!-- Info Pengirim -->
+        <div class="relative z-10 bg-slate-800/60 rounded-xl p-4 mb-6 border border-slate-700 flex items-center gap-4">
+            <div class="bg-slate-700 p-3 rounded-lg"><i class="fa-solid fa-user-tie text-gray-300 text-2xl"></i></div>
+            <div class="flex-1">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Pengirim (Sender)</p>
+                <p class="text-lg font-bold text-white leading-none">Admin IT <span class="text-xs text-sky-400 bg-sky-900/50 px-2 py-0.5 rounded ml-2">Master Node</span></p>
+            </div>
+        </div>
+
+        <!-- Info File -->
+        <div class="relative z-10 mb-8 text-center">
+            <i class="fa-solid fa-file-zipper text-5xl text-sky-300 mb-3 drop-shadow-[0_0_10px_rgba(56,189,248,0.6)]"></i>
+            <h3 class="text-xl font-bold text-white truncate max-w-full px-4" id="file-name">update_patch_sastro_v2.exe</h3>
+            <p class="text-sm text-gray-400 mt-1" id="file-size">Ukuran: 145 MB</p>
+        </div>
+
+        <!-- Progress Bar & Speed -->
+        <div class="relative z-10 mb-6">
+            <div class="flex justify-between items-end mb-2 text-sm">
+                <span class="text-sky-300 font-semibold" id="transfer-status">Mengunduh ke lokal...</span>
+                <span class="text-3xl font-black text-white" id="transfer-percent">0%</span>
+            </div>
+            
+            <div class="w-full bg-slate-900 rounded-full h-4 border border-slate-700 relative overflow-hidden">
+                <div class="scan-line"></div>
+                <div id="progress-bar" class="bg-gradient-to-r from-sky-600 to-cyan-400 h-full rounded-full transition-all duration-300 relative shadow-[0_0_10px_rgba(34,211,238,0.8)]" style="width: 0%">
+                    <!-- Efek kilau pada bar -->
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-white/30 rounded-t-full"></div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between mt-2 text-xs text-gray-400 font-mono">
+                <span id="transfer-speed"><i class="fa-solid fa-gauge-high mr-1 text-emerald-400"></i> Speed: 0 MB/s</span>
+                <span id="transfer-eta"><i class="fa-regular fa-clock mr-1"></i> ETA: Menghitung...</span>
+            </div>
+        </div>
+
+        <!-- Lokasi Penyimpanan -->
+        <div class="relative z-10 bg-black/40 rounded p-3 text-xs text-gray-400 font-mono border border-white/5 break-all">
+            <i class="fa-solid fa-folder-open text-amber-400 mr-1"></i> Target Folder: <span class="text-gray-300" id="save-path">C:\Users\Public\Downloads\</span>
+        </div>
+
+    </div>
+
+    <!-- Script Simulasi & Sinkronisasi Unduhan Nyata -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let progress = 0;
+            const bar = document.getElementById('progress-bar');
+            const percentTxt = document.getElementById('transfer-percent');
+            const speedTxt = document.getElementById('transfer-speed');
+            const etaTxt = document.getElementById('transfer-eta');
+            const statusTxt = document.getElementById('transfer-status');
+            
+            // Simulasi ukuran file 145MB
+            const totalSize = 145; 
+            let isDownloaded = false; // Flag keamanan agar unduh hanya terjadi 1x
+            
+            const interval = setInterval(() => {
+                // Kecepatan download acak antara 5 - 15 MB/s
+                const speed = (Math.random() * 10 + 5).toFixed(1); 
+                
+                // Hitung tambahan persentase (Interval tiap 0.5 detik)
+                const increment = (speed / totalSize) * 100 * 0.5; 
+                progress += increment;
+                
+                if (progress > 100) progress = 100;
+                
+                // Update Animasi UI
+                bar.style.width = progress + '%';
+                percentTxt.innerText = Math.floor(progress) + '%';
+                speedTxt.innerHTML = `<i class="fa-solid fa-gauge-high mr-1 text-emerald-400"></i> Speed: ${speed} MB/s`;
+                
+                // Hitung Sisa Waktu (ETA)
+                const remainingSize = totalSize - (totalSize * (progress/100));
+                const etaSeconds = Math.round(remainingSize / speed);
+                etaTxt.innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ETA: ${etaSeconds} detik`;
+
+                // KETIKA MENCAPAI 100%, SINKRONKAN DENGAN BROWSER
+                if (progress >= 100 && !isDownloaded) {
+                    clearInterval(interval);
+                    isDownloaded = true; // Kunci agar tidak dobel
+                    
+                    statusTxt.innerText = "Selesai. Menyimpan ke disk lokal...";
+                    statusTxt.classList.replace('text-sky-300', 'text-emerald-400');
+                    speedTxt.innerHTML = `<i class="fa-solid fa-check mr-1 text-emerald-400"></i> Ditransfer`;
+                    etaTxt.innerHTML = "Selesai";
+                    
+                    // Efek warna hijau (Sukses)
+                    bar.classList.replace('from-sky-600', 'from-emerald-600');
+                    bar.classList.replace('to-cyan-400', 'to-emerald-400');
+                    
+                    // Trigger unduhan di browser TEPAT SAAT UI 100%
+                    triggerBrowserDownload();
+                }
+            }, 500); // Update tiap 500ms
+
+            // Fungsi Pemicu Unduhan di Browser
+            function triggerBrowserDownload() {
+                // CATATAN: Untuk backend Node.js asli kamu, ganti kode di dalam blok ini menjadi:
+                // window.location.href = 'http://localhost:4545/api/download/update_patch_sastro_v2.exe';
+                
+                // --- DEMO DUMMY BLOB (Hanya agar muncul notif unduh di browser) ---
+                const dummyContent = "Ini adalah file patch S.A.S.T.R.O yang berhasil diunduh dari Admin IT.";
+                const blob = new Blob([dummyContent], { type: 'text/plain' });
+                const downloadUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement("a");
+                a.style.display = "none";
+                a.href = downloadUrl;
+                a.download = "update_patch_sastro_v2.txt"; // Sesuaikan dengan nama file
+                
+                document.body.appendChild(a);
+                a.click(); // Memaksa browser memunculkan bar unduhan di bawah/atas
+                
+                // Bersihkan memory dan ubah teks setelah selesai
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(downloadUrl);
+                    document.body.removeChild(a);
+                    percentTxt.innerText = "DONE";
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

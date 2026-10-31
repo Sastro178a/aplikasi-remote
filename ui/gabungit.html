@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.S.T.R.O v2.0 - Client Standby</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap');
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #064e3b; color: #fff; overflow: hidden; }
+        
+        /* Virtual Page System */
+        .v-page { display: none; width: 100vw; height: 100vh; flex-direction: column; align-items: center; justify-content: center; }
+        .v-page.active { display: flex; }
+
+        .no-select { user-select: none; -webkit-user-select: none; }
+        
+        /* Background Animation */
+        .bg-animate {
+            background: linear-gradient(-45deg, #064e3b, #065f46, #047857, #059669);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-animate no-select">
+
+    <!-- ========================================================================= -->
+    <!-- 1. SETUP CLIENT (Meminta Pair Code)                                       -->
+    <!-- ========================================================================= -->
+    <div id="page-setup" class="v-page active relative">
+        <!-- Floating particles effect -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+            <i class="fa-solid fa-network-wired absolute top-10 left-10 text-4xl"></i>
+            <i class="fa-solid fa-laptop absolute bottom-20 right-20 text-6xl"></i>
+            <i class="fa-solid fa-server absolute top-1/3 right-1/4 text-5xl"></i>
+        </div>
+
+        <div class="relative bg-white p-6 sm:p-8 rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.3)] w-[90%] max-w-md mx-auto z-10 border-t-8 border-t-emerald-500">
+            <button onclick="window.location.href='index.html'" class="absolute top-4 left-4 text-gray-400 hover:text-emerald-600 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Batal
+            </button>
+            
+            <div class="text-center mb-6 mt-6">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full mb-4">
+                    <i class="fa-solid fa-network-wired text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Gabung Tim IT</h2>
+                <p class="text-sm text-gray-500 mt-1">S.A.S.T.R.O v2.0 Client Agent</p>
+            </div>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Nama PC / Perangkat</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-desktop text-gray-400"></i>
+                        </div>
+                        <input type="text" id="pc-name-input" placeholder="Contoh: PC-Siswa-01" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Kode Tautan (Pair Code)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-key text-gray-400"></i>
+                        </div>
+                        <input type="text" id="pair-code-input" placeholder="Masukkan Pair Code dari Admin..." class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all">
+                    </div>
+                </div>
+                <button onclick="startConnection()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plug"></i> Hubungkan ke Admin
+                </button>
+            </div>
+        </div>
+        <p class="mt-8 text-emerald-200/60 text-sm font-mono z-10">Waiting for configuration...</p>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. LOADING SCREEN                                                         -->
+    <!-- ========================================================================= -->
+    <div id="page-loading" class="v-page text-white">
+        <i class="fa-solid fa-circle-notch fa-spin text-6xl text-emerald-400 mb-6"></i>
+        <h2 class="text-2xl font-bold tracking-wider mb-2">MENGHUBUNGKAN...</h2>
+        <p class="text-emerald-200/80 mb-6" id="loading-text">Memvalidasi Pair Code ke Master Server</p>
+        <div class="w-64 bg-emerald-950 rounded-full h-2">
+            <div id="loading-bar" class="bg-emerald-400 h-2 rounded-full transition-all duration-200" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 3. STANDBY SCREEN (Background Mode)                                       -->
+    <!-- ========================================================================= -->
+    <div id="page-standby" class="v-page text-white relative">
+        <div class="absolute inset-0 flex items-center justify-center opacity-10">
+            <i class="fa-solid fa-shield-halved text-[20rem]"></i>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center text-center p-6">
+            <div class="relative mb-8">
+                <div class="absolute inset-0 bg-emerald-400 rounded-full blur-xl animate-pulse opacity-50"></div>
+                <div class="relative bg-emerald-500 text-white w-24 h-24 rounded-full flex items-center justify-center border-4 border-emerald-300 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+                    <i class="fa-solid fa-check text-5xl"></i>
+                </div>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-black mb-2 tracking-wide drop-shadow-md">TERHUBUNG</h1>
+            <p class="text-xl text-emerald-200 mb-8 font-light">S.A.S.T.R.O berjalan di latar belakang.</p>
+            
+            <div class="bg-black/20 backdrop-blur-md rounded-lg p-4 border border-white/10 mb-8 w-full max-w-sm text-left">
+                <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
+                    <span class="text-emerald-200 text-sm">Status Agent</span>
+                    <span class="text-emerald-400 font-bold text-sm"><i class="fa-solid fa-circle-dot animate-pulse mr-1"></i>Aktif</span>
+                </div>
+                <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
+                    <span class="text-emerald-200 text-sm">Nama PC</span>
+                    <span class="text-white font-mono text-sm" id="standby-pc-name">-</span>
+                </div>
+                <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
+                    <span class="text-emerald-200 text-sm">Target Server</span>
+                    <span class="text-white font-mono text-sm">Admin-IT-Core</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-emerald-200 text-sm">Local Port</span>
+                    <span class="text-white font-mono text-sm">4545</span>
+                </div>
+            </div>
+
+            <button onclick="disconnect()" class="px-8 py-3 bg-red-600/90 hover:bg-red-500 text-white font-bold rounded-lg shadow-lg border border-red-400/50 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-power-off"></i> Putuskan Koneksi
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[100] flex flex-col items-end pointer-events-none"></div>
+
+    <script>
+        function navTo(pageId) {
+            document.querySelectorAll('.v-page').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function startConnection() {
+            const pcName = document.getElementById('pc-name-input').value.trim();
+            const code = document.getElementById('pair-code-input').value.trim();
+            
+            if (!pcName) {
+                showToast('Nama PC tidak boleh kosong!', 'error');
+                return;
+            }
+            if (!code) {
+                showToast('Pair Code tidak boleh kosong!', 'error');
+                return;
+            }
+
+            // Set nama PC ke layar Standby
+            document.getElementById('standby-pc-name').innerText = pcName;
+
+            // Simulasi proses koneksi
+            navTo('page-loading');
+            let progress = 0;
+            const bar = document.getElementById('loading-bar');
+            const txt = document.getElementById('loading-text');
+            
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 25) + 15;
+                if(progress > 100) progress = 100;
+                bar.style.width = progress + '%';
+                
+                if(progress > 40 && progress < 80) {
+                    txt.innerText = "Menerapkan konfigurasi keamanan...";
+                } else if (progress >= 80) {
+                    txt.innerText = "Mengunci port komunikasi LAN...";
+                }
+
+                if(progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        navTo('page-standby');
+                        showToast('Berhasil terhubung ke jaringan Admin IT.', 'success');
+                    }, 600);
+                }
+            }, 500);
+        }
+
+        function disconnect() {
+            // Simulasi putus koneksi dan kembali ke awal
+            showToast('Koneksi diputus. Menghentikan service lokal...', 'warning');
+            setTimeout(() => {
+                document.getElementById('pair-code-input').value = '';
+                navTo('page-setup');
+            }, 1500);
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let border = 'border-blue-500';
+            let icon = '<i class="fa-solid fa-circle-info text-blue-500 text-xl"></i>';
+            if(type === 'success') { border = 'border-emerald-500'; icon = '<i class="fa-solid fa-circle-check text-emerald-500 text-xl"></i>'; }
+            if(type === 'error') { border = 'border-red-500'; icon = '<i class="fa-solid fa-circle-xmark text-red-500 text-xl"></i>'; }
+            if(type === 'warning') { border = 'border-yellow-500'; icon = '<i class="fa-solid fa-triangle-exclamation text-yellow-500 text-xl"></i>'; }
+
+            toast.className = `flex items-center gap-3 p-4 rounded shadow-lg border-l-4 ${border} bg-white text-gray-800 min-w-[300px] mb-2 transform transition-all duration-300 translate-x-full opacity-0 pointer-events-auto`;
+            toast.innerHTML = `${icon} <span class="text-sm font-semibold flex-1">${message}</span>`;
+            
+            container.appendChild(toast);
+            requestAnimationFrame(() => { toast.classList.remove('translate-x-full', 'opacity-0'); });
+
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

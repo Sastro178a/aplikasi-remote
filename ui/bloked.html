@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.S.T.R.O v2.0 - Akses Diblokir</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #450a0a; /* Dark red background */
+            color: #fff; 
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .no-select { user-select: none; -webkit-user-select: none; }
+        
+        /* Alert Background Animation */
+        .bg-alert {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, #7f1d1d 0%, #450a0a 70%, #000000 100%);
+            animation: pulse-alert 2s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes pulse-alert {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* Warning Stripes */
+        .stripes {
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 15px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ef4444,
+                #ef4444 20px,
+                #000000 20px,
+                #000000 40px
+            );
+            z-index: 10;
+        }
+        .stripes.bottom {
+            top: auto; bottom: 0;
+        }
+    </style>
+</head>
+<body class="no-select">
+
+    <div class="bg-alert"></div>
+    <div class="stripes"></div>
+    
+    <div class="relative z-10 text-center p-8 md:p-16 bg-black/50 backdrop-blur-md rounded-3xl border-2 border-red-600 shadow-[0_0_100px_rgba(220,38,38,0.7)] max-w-2xl w-[90%] transform transition-all hover:scale-[1.02] duration-300">
+        
+        <div class="relative inline-block mb-6">
+            <div class="absolute inset-0 bg-red-600 rounded-full blur-2xl opacity-60 animate-pulse"></div>
+            <i class="fa-solid fa-hand text-8xl md:text-9xl text-red-500 relative z-10 drop-shadow-[0_0_15px_rgba(255,0,0,0.8)]"></i>
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-orbitron font-black mb-4 tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-red-700 drop-shadow-lg">
+            AKSES DITOLAK
+        </h1>
+        
+        <div class="h-px w-3/4 bg-gradient-to-r from-transparent via-red-500 to-transparent mx-auto mb-6"></div>
+
+        <p class="text-xl md:text-2xl text-red-200 mb-4 font-semibold">
+            Tindakan Diblokir oleh S.A.S.T.R.O
+        </p>
+        
+        <p class="text-gray-300 mb-8 max-w-lg mx-auto">
+            Aplikasi atau Website yang Anda coba buka telah dimasukkan ke dalam <strong class="text-white">Daftar Hitam (Blacklist)</strong> oleh Administrator jaringan atau kebijakan keamanan lokal.
+        </p>
+
+        <div class="inline-block bg-black/60 border border-red-800 rounded-lg px-6 py-4 mb-8">
+            <p class="text-gray-400 font-mono text-sm mb-1">ERR_POLICY_VIOLATION</p>
+            <p class="text-red-400 font-mono text-xs uppercase tracking-wider animate-pulse">RESTRICTED_CONTENT_OR_EXECUTABLE</p>
+        </div>
+
+        <div>
+            <!-- Tombol ini hanya sebagai demo untuk kembali, pada aplikasi asli mungkin window/tab ini akan tertutup otomatis -->
+            <button onclick="window.history.back()" class="px-8 py-3 bg-red-700 hover:bg-red-600 text-white font-bold rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition-all border border-red-500 group flex items-center justify-center gap-3 mx-auto">
+                <i class="fa-solid fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Kembali ke Keamanan
+            </button>
+        </div>
+    </div>
+
+    <div class="stripes bottom"></div>
+
+    <script>
+        // Opsional: Bunyikan suara peringatan (beep) secara default jika diizinkan browser
+        window.onload = function() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+                
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } catch (e) {
+                console.log("Audio warning prevented by browser policy.");
+            }
+        };
+    </script>
+</body>
+</html>

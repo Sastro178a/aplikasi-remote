@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.S.T.R.O v2.0 - Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap');
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; color: #333; overflow: hidden; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 5px; border: 2px solid #e5e7eb; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* Virtual Page System */
+        .v-page { display: none; width: 100vw; height: 100vh; }
+        .v-page.active { display: flex; }
+
+        /* NetSupport Style Toolbar Button */
+        .ns-btn { 
+            display: flex; flex-direction: column; items-center; justify-content: center; 
+            padding: 0.5rem 0.75rem; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s;
+            text-align: center; border: 1px solid transparent; min-width: 70px;
+        }
+        .ns-btn:hover { background-color: #e0f2fe; border-color: #bae6fd; }
+        .ns-btn i { font-size: 1.75rem; margin-bottom: 0.25rem; color: #0284c7; }
+        .ns-btn span { font-size: 0.7rem; font-weight: 600; color: #4b5563; }
+
+        /* Sidebar Icon */
+        .side-icon {
+            flex: 1 0 auto; min-width: 70px; padding: 0.5rem 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #d1d5db; cursor: pointer; transition: all 0.2s; gap: 0.25rem;
+        }
+        .side-icon i { font-size: 1.5rem; }
+        .side-icon span { font-size: 0.6rem; font-weight: bold; text-align: center; line-height: 1; }
+        .side-icon:hover { background-color: rgba(255,255,255,0.1); color: #fff; }
+        .side-icon.active { background-color: #0ea5e9; color: #fff; border-bottom: 4px solid #fff; }
+
+        @media (min-width: 640px) {
+            .side-icon { width: 100%; flex: none; min-width: auto; padding: 0.75rem 0; }
+            .side-icon.active { border-left: 4px solid #fff; border-bottom: none; }
+        }
+
+        /* Grid Item Selection */
+        .pc-card { border: 2px solid transparent; transition: all 0.1s; }
+        .pc-card.selected { border-color: #0ea5e9; background-color: #e0f2fe; box-shadow: 0 0 10px rgba(14, 165, 233, 0.3); }
+
+        .mirror-cursor { cursor: crosshair; }
+        #mirror-screen:focus { outline: 2px solid #06b6d4; box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); }
+        
+        /* Prevent annoying browser selections */
+        .no-select { user-select: none; -webkit-user-select: none; }
+    </style>
+</head>
+<body class="bg-gray-100 no-select">
+
+    <!-- ========================================================================= -->
+    <!-- 0. PILIH MODE (pilihmode.html)                                            -->
+    <!-- ========================================================================= -->
+    <div id="page-pilihmode" class="v-page flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center active">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="relative z-10 w-[95%] max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-2 tracking-wider drop-shadow-lg">S.A.S.T.R.O <span class="text-sky-400">v2.0</span></h1>
+            <p class="text-gray-300 mb-10 text-lg">System Automated Signal & Tech Remote Operator</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Mode 1: Admin IT (Redirection to admin.html / Portal Admin) -->
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl hover:bg-white/20 transition cursor-pointer group" onclick="window.location.href='admin.html'">
+                    <i class="fa-solid fa-user-tie text-5xl text-sky-400 mb-4 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-2">Admin IT (Master)</h3>
+                    <p class="text-sm text-gray-300">Pusat kendali admin (admin.html). Kelola semua PC dengan verifikasi Pair Code.</p>
+                </div>
+                
+                <!-- Mode 2: Gabung Tim IT -->
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl hover:bg-white/20 transition cursor-pointer group" onclick="window.location.href='gabungit.html'">
+                    <i class="fa-solid fa-network-wired text-5xl text-emerald-400 mb-4 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-2">Client (Gabung IT)</h3>
+                    <p class="text-sm text-gray-300">Hubungkan PC ini ke jaringan Admin IT menggunakan Pair Code saja.</p>
+                </div>
+                
+                <!-- Mode 3: User Mandiri -->
+                <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-xl hover:bg-white/20 transition cursor-pointer group" onclick="window.location.href='usermandiri.html'">
+                    <i class="fa-solid fa-user-shield text-5xl text-amber-400 mb-4 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="text-xl font-bold text-white mb-2">User Mandiri</h3>
+                    <p class="text-sm text-gray-300">Gunakan S.A.S.T.R.O sebagai pelindung mandiri (Blokir Web/Aplikasi) di PC sendiri.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 1. SETUP ADMIN IT (Menggunakan Pair Code Saja - Redirect ke admin.html)    -->
+    <!-- ========================================================================= -->
+    <div id="page-setusergrup" class="v-page flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-[90%] max-w-md mx-auto z-10 border-t-8 border-t-sky-500">
+            <button onclick="navTo('page-pilihmode')" class="absolute top-4 left-4 text-gray-400 hover:text-sky-600"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+            <div class="text-center mb-6 mt-4">
+                <i class="fa-solid fa-user-tie text-5xl text-sky-500 mb-2"></i>
+                <h2 class="text-2xl font-bold text-gray-800">Verifikasi Admin (admin.html)</h2>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Masukkan Pair Code Admin</label>
+                    <input type="password" id="admin-pair-verify" placeholder="Masukkan Pair Code terdaftar..." class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:outline-none focus:border-sky-500">
+                </div>
+                <button onclick="verifyAndRedirectAdmin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-lg shadow mt-4 transition-colors">Masuk Portal Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 1B. SETUP CLIENT (Hanya Butuh Pair Code)                                  -->
+    <!-- ========================================================================= -->
+    <div id="page-gabungit" class="v-page flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-[90%] max-w-md mx-auto z-10 border-t-8 border-t-emerald-500">
+            <button onclick="navTo('page-pilihmode')" class="absolute top-4 left-4 text-gray-400 hover:text-emerald-600"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+            <div class="text-center mb-6 mt-4">
+                <i class="fa-solid fa-network-wired text-5xl text-emerald-500 mb-2"></i>
+                <h2 class="text-2xl font-bold text-gray-800">Gabung Tim IT (Pair Code)</h2>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Kode Tautan (Pair Code)</label>
+                    <input type="text" placeholder="Masukkan Pair Code jaringan..." class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-emerald-500">
+                </div>
+                <button onclick="simulateLoading('client', 'page-client-standby')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow mt-4 transition-colors">Hubungkan Otomatis</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 1C. SETUP USER MANDIRI                                                    -->
+    <!-- ========================================================================= -->
+    <div id="page-usermandiri" class="v-page flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-[90%] max-w-md mx-auto z-10 border-t-8 border-t-amber-500">
+            <button onclick="navTo('page-pilihmode')" class="absolute top-4 left-4 text-gray-400 hover:text-amber-600"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+            <div class="text-center mb-6 mt-4">
+                <i class="fa-solid fa-user-shield text-5xl text-amber-500 mb-2"></i>
+                <h2 class="text-2xl font-bold text-gray-800">Setup Mandiri</h2>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Nama Profil (User)</label>
+                    <input type="text" placeholder="Contoh: PC Pribadi Budi" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Buat PIN Perlindungan</label>
+                    <input type="password" placeholder="PIN untuk buka blokir..." class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-amber-500">
+                </div>
+                <button onclick="simulateLoading('mandiri', 'page-mandiri-dashboard')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow mt-4 transition-colors">Mulai Proteksi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- X. HALAMAN STANDBY (Client/Mandiri Demo)                                  -->
+    <!-- ========================================================================= -->
+    <div id="page-client-standby" class="v-page flex-col items-center justify-center bg-emerald-900 text-white">
+        <i class="fa-solid fa-network-wired text-6xl text-emerald-400 mb-6 animate-pulse"></i>
+        <h2 class="text-3xl font-bold mb-2">Terhubung ke Admin IT</h2>
+        <p class="text-emerald-200 mb-8">S.A.S.T.R.O berjalan di latar belakang.</p>
+        <button onclick="logout()" class="px-6 py-2 bg-emerald-700 hover:bg-emerald-600 rounded">Ubah Mode (Keluar)</button>
+    </div>
+
+    <div id="page-mandiri-dashboard" class="v-page flex-col items-center justify-center bg-amber-100 text-amber-900">
+        <i class="fa-solid fa-shield-check text-6xl text-amber-600 mb-6"></i>
+        <h2 class="text-3xl font-bold mb-2">Mode Mandiri Aktif</h2>
+        <p class="text-amber-700 mb-8">Sistem Anda sekarang diproteksi secara lokal.</p>
+        <button onclick="logout()" class="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded shadow">Ubah Mode (Keluar)</button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. FILE: loadingshare.html (Layar Loading)                                -->
+    <!-- ========================================================================= -->
+    <div id="page-loadingshare" class="v-page flex-col items-center justify-center bg-gray-900 text-white">
+        <i class="fa-solid fa-circle-notch fa-spin text-6xl text-sky-500 mb-6"></i>
+        <h2 class="text-2xl font-bold tracking-wider mb-2">MENYIAPKAN LINGKUNGAN...</h2>
+        <p class="text-gray-400" id="loading-text">Menghubungkan ke port 4545 jaringan lokal</p>
+        <div class="w-64 bg-gray-800 rounded-full h-2 mt-6">
+            <div id="loading-bar" class="bg-sky-500 h-2 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 5. FILE: bloked.html (Layar Peringatan Blokir)                            -->
+    <!-- ========================================================================= -->
+    <div id="page-bloked" class="v-page flex-col items-center justify-center bg-red-900 text-white">
+        <div class="text-center p-12 bg-black/60 rounded-2xl border-2 border-red-500 shadow-[0_0_80px_rgba(220,38,38,0.6)]">
+            <i class="fa-solid fa-hand text-8xl text-red-500 mb-6"></i>
+            <h1 class="text-5xl font-black mb-4">AKSES DITOLAK</h1>
+            <p class="text-2xl text-red-200 mb-2">Aplikasi atau Website ini diblokir oleh Administrator.</p>
+            <p class="text-gray-400 mb-8 font-mono">Policy_Violation: Restricted_Content_or_App</p>
+            <button onclick="navTo('page-dashboard')" class="px-8 py-3 bg-red-700 hover:bg-red-600 font-bold rounded shadow-lg">Kembali ke Demo Dashboard</button>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 6. FILE: ADMIN DASHBOARD (Mirip NetSupport School)                        -->
+    <!-- ========================================================================= -->
+    <div id="page-dashboard" class="v-page flex flex-col sm:flex-row h-screen w-screen overflow-hidden">
+        
+        <!-- SIDEBAR (Dark Gray) - 8 MENU EKSPLISIT -->
+        <aside class="order-last sm:order-first w-full h-[72px] sm:w-20 sm:h-full bg-[#525252] flex flex-row sm:flex-col items-center sm:py-4 shrink-0 z-20 border-t sm:border-t-0 sm:border-r border-gray-800 shadow-xl overflow-x-auto sm:overflow-y-auto">
+            <div class="side-icon active mb-1" onclick="switchMainView('grid')" title="Menu 3: Daftar Perangkat">
+                <i class="fa-solid fa-display"></i><span>Monitor</span>
+            </div>
+            <div class="side-icon mb-1" onclick="switchMainView('inventory')" title="Menu 6: Aplikasi Terinstal">
+                <i class="fa-solid fa-list-check"></i><span>Inventory</span>
+            </div>
+            <div class="side-icon mb-1" onclick="switchMainView('appblock')" title="Menu 5: Daftar Hitam Aplikasi">
+                <i class="fa-solid fa-ban"></i><span>Block App</span>
+            </div>
+            <div class="side-icon mb-1" onclick="switchMainView('webblock')" title="Menu 4: Daftar Hitam Web">
+                <i class="fa-solid fa-globe"></i><span>Block Web</span>
+            </div>
+            <div class="side-icon mb-1" onclick="switchMainView('filetrans')" title="Menu 7: Kirim File & Run">
+                <i class="fa-solid fa-file-export"></i><span>Send File</span>
+            </div>
+            <div class="ml-auto sm:ml-0 sm:mt-auto side-icon text-red-400 hover:text-red-300 hover:bg-red-900/30" onclick="logout()" title="Keluar">
+                <i class="fa-solid fa-power-off"></i><span>Keluar</span>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <main class="flex-1 flex flex-col min-w-0 bg-white relative">
+            
+            <!-- TOP TOOLBAR -->
+            <header class="bg-white border-b border-gray-300 px-4 py-2 flex items-center justify-between shadow-sm z-10 overflow-x-auto">
+                <div class="flex items-center gap-1 min-w-max">
+                    <!-- Tindakan Masal (Mirip NetSupport) -->
+                    <div class="ns-btn" onclick="bulkAction('poweron')">
+                        <i class="fa-solid fa-plug-circle-bolt" style="color: #10b981;"></i><span>Power On</span>
+                    </div>
+                    <div class="ns-btn" onclick="bulkAction('shutdown')">
+                        <i class="fa-solid fa-power-off" style="color: #ef4444;"></i><span>Shutdown</span>
+                    </div>
+                    <div class="ns-btn" onclick="bulkAction('restart')">
+                        <i class="fa-solid fa-rotate-right" style="color: #f59e0b;"></i><span>Restart</span>
+                    </div>
+                    <div class="w-px h-10 bg-gray-300 mx-2"></div> <!-- divider -->
+                    <div class="ns-btn" onclick="bulkAction('lock')">
+                        <i class="fa-solid fa-lock" style="color: #0284c7;"></i><span>Lock</span>
+                    </div>
+                    <div class="ns-btn" onclick="bulkAction('unlock')">
+                        <i class="fa-solid fa-unlock" style="color: #3b82f6;"></i><span>Unlock</span>
+                    </div>
+                    <div class="ns-btn" onclick="bulkAction('blank')">
+                        <i class="fa-solid fa-desktop" style="color: #475569;"></i><span>Blank All</span>
+                    </div>
+                    <div class="w-px h-10 bg-gray-300 mx-2"></div> <!-- divider -->
+                    <div class="ns-btn" onclick="bulkAction('move_group')">
+                        <i class="fa-solid fa-users-gear" style="color: #8b5cf6;"></i><span>Set Group</span>
+                    </div>
+                    <div class="w-px h-10 bg-gray-300 mx-2"></div> <!-- divider -->
+                    <div class="ns-btn" onclick="bulkAction('message')">
+                        <i class="fa-regular fa-envelope" style="color: #f59e0b;"></i><span>Message</span>
+                    </div>
+                    <div class="ns-btn" onclick="bulkAction('file')">
+                        <i class="fa-solid fa-file-export" style="color: #10b981;"></i><span>Send File</span>
+                    </div>
+                    <div class="w-px h-10 bg-gray-300 mx-2"></div> <!-- divider -->
+                    <div class="ns-btn" onclick="openQuickLaunchModal()">
+                        <i class="fa-solid fa-rocket" style="color: #ef4444;"></i><span>Quick Launch</span>
+                    </div>
+                    <div class="ns-btn" onclick="openSelectedMirror()">
+                        <i class="fa-solid fa-eye" style="color: #8b5cf6;"></i><span>Watch</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 min-w-max ml-4">
+                    <div class="bg-gray-100 rounded p-1 flex border border-gray-300">
+                        <button onclick="switchDisplayMode('grid')" id="btn-disp-grid" class="px-3 py-1 rounded bg-white shadow-sm border border-gray-300 text-sky-600" title="Tampilan Kotak (Grid)"><i class="fa-solid fa-border-all"></i></button>
+                        <button onclick="switchDisplayMode('list')" id="btn-disp-list" class="px-3 py-1 rounded text-gray-500 hover:text-gray-800" title="Tampilan Tabel (List)"><i class="fa-solid fa-list"></i></button>
+                    </div>
+                    <button class="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow" onclick="triggerBlockedDemo()">
+                        <i class="fa-solid fa-shield-halved"></i> <span>Test Blokir</span>
+                    </button>
+                    <div class="ns-btn" onclick="renderPCGrid()">
+                        <i class="fa-solid fa-arrows-rotate" style="color: #10b981; font-size: 1.5rem;"></i><span>Refresh</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- SUB TOOLBAR (Tabs) -->
+            <div class="bg-gray-100 border-b border-gray-300 px-4 flex items-center h-10 text-sm">
+                <div class="flex" id="group-tabs-container">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="ml-auto text-xs text-gray-500">
+                    Role: <span id="current-role-display" class="font-bold text-sky-600 uppercase">ADMIN</span>
+                </div>
+            </div>
+
+            <!-- DYNAMIC CONTENT AREA -->
+            <div class="flex-1 overflow-auto bg-gray-100 relative">
+                
+                <!-- VIEW A: MONITOR GRID -->
+                <div id="view-grid" class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-bold text-gray-700 bg-white px-3 py-1.5 rounded shadow-sm border border-gray-300 hover:bg-gray-50">
+                            <input type="checkbox" id="chk-all-grid" onchange="toggleAllPC(this.checked)" class="accent-sky-600 w-4 h-4"> Pilih Semua (Grid)
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" id="pc-grid-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- VIEW A-2: MONITOR LIST (TABEL) -->
+                <div id="view-list" class="p-4 sm:p-6 hidden">
+                    <div class="bg-white border border-gray-300 rounded shadow-sm overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[600px]">
+                            <thead class="bg-[#f0f0f0] border-b border-gray-300 text-gray-700">
+                                <tr>
+                                    <th class="p-3 w-10 text-center"><input type="checkbox" id="chk-all" onchange="toggleAllPC(this.checked)" class="accent-sky-600"></th>
+                                    <th class="p-3">Nama PC</th>
+                                    <th class="p-3">User Aktif</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">IP Address</th>
+                                    <th class="p-3">MAC Address</th>
+                                    <th class="p-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pc-list-container" class="divide-y divide-gray-200">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW MENU 6: LIHAT APLIKASI DIINSTAL (INVENTORY) -->
+                <div id="view-inventory" class="p-4 sm:p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700"><i class="fa-solid fa-list-check mr-2 text-sky-600"></i>Inventory & Uninstaller Jarak Jauh</h2>
+                    <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
+                        <div class="w-full lg:w-1/3 bg-white border border-gray-300 rounded shadow-sm overflow-hidden h-[35vh] lg:h-[70vh] flex flex-col shrink-0">
+                            <div class="p-3 bg-gray-100 font-bold border-b border-gray-300 shrink-0">Pilih Perangkat</div>
+                            <div class="flex-1 overflow-y-auto p-2 space-y-1">
+                                <button class="w-full text-left p-2 bg-sky-50 text-sky-700 font-bold rounded border border-sky-200"><i class="fa-solid fa-desktop mr-2"></i>PC-Andi</button>
+                                <button class="w-full text-left p-2 hover:bg-gray-100 rounded"><i class="fa-solid fa-desktop mr-2 text-gray-400"></i>PC-Budi</button>
+                                <button class="w-full text-left p-2 hover:bg-gray-100 rounded"><i class="fa-solid fa-desktop mr-2 text-gray-400"></i>Laptop-Siti</button>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full lg:flex-1 bg-white border border-gray-300 rounded shadow-sm overflow-hidden h-[50vh] lg:h-[70vh] flex flex-col">
+                            <div class="p-3 bg-gray-100 font-bold border-b border-gray-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 shrink-0">
+                                <span>Aplikasi terinstal di: <span class="text-sky-600">PC-Andi</span></span>
+                                <div class="relative w-full sm:w-auto mt-2 sm:mt-0">
+                                    <input type="text" placeholder="Cari aplikasi..." class="w-full border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-sky-500">
+                                </div>
+                            </div>
+                            <div class="flex-1 overflow-x-auto overflow-y-auto">
+                                <table class="w-full text-left text-sm min-w-[500px]">
+                                    <thead class="bg-gray-50 border-b border-gray-200">
+                                        <tr><th class="p-3">Nama Aplikasi</th><th class="p-3">Versi</th><th class="p-3 text-right">Tindakan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        <tr>
+                                            <td class="p-3 font-semibold">Internet Download Manager</td>
+                                            <td class="p-3 text-gray-500">6.41</td>
+                                            <td class="p-3 text-right">
+                                                <button onclick="showToast('Perintah Uninstall IDM dikirim ke PC-Andi', 'success')" class="px-2 py-1 bg-red-100 text-red-600 hover:bg-red-200 rounded text-xs font-bold mr-1">Uninstall</button>
+                                                <button onclick="showToast('Aplikasi dimasukkan ke daftar blokir', 'info')" class="px-2 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded text-xs font-bold">Blokir</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-semibold">Google Chrome</td>
+                                            <td class="p-3 text-gray-500">114.0</td>
+                                            <td class="p-3 text-right">
+                                                <button class="px-2 py-1 bg-red-100 text-red-600 hover:bg-red-200 rounded text-xs font-bold mr-1">Uninstall</button>
+                                                <button class="px-2 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded text-xs font-bold">Blokir</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW MENU 5: DAFTAR HITAM APLIKASI -->
+                <div id="view-appblock" class="p-4 sm:p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700"><i class="fa-solid fa-ban mr-2 text-sky-600"></i>Daftar Hitam Aplikasi (Watchdog)</h2>
+                    <div class="bg-white border border-gray-300 rounded shadow-sm overflow-x-auto mb-6">
+                        <div class="p-4 bg-gray-50 border-b border-gray-300 flex flex-col sm:flex-row gap-2 sm:gap-4">
+                            <input type="text" id="input-block-app" placeholder="Nama EXE (contoh: idm.exe)" class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-sky-500 outline-none w-full">
+                            <button onclick="addList('app')" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow font-medium whitespace-nowrap">Blokir Otomatis</button>
+                        </div>
+                        <table class="w-full text-left text-sm min-w-[400px]">
+                            <thead class="bg-gray-100 border-b border-gray-300">
+                                <tr><th class="p-3">Nama Executable</th><th class="p-3 text-right">Aksi</th></tr>
+                            </thead>
+                            <tbody id="app-list-body" class="divide-y divide-gray-200">
+                                <tr><td class="p-3 font-mono text-red-600">notepad.exe</td><td class="p-3 text-right"><button class="text-gray-500 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW C: BLOKIR WEB -->
+                <div id="view-webblock" class="p-4 sm:p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700"><i class="fa-solid fa-globe mr-2 text-sky-600"></i>Daftar Hitam Website (Hosts)</h2>
+                    <div class="bg-white border border-gray-300 rounded shadow-sm overflow-x-auto">
+                        <div class="p-4 bg-gray-50 border-b border-gray-300 flex flex-col sm:flex-row gap-2 sm:gap-4">
+                            <input type="text" id="input-block-url" placeholder="Domain (contoh: facebook.com)" class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-sky-500 outline-none w-full">
+                            <button onclick="addList('url')" class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded shadow font-medium whitespace-nowrap">Tambahkan Kebijakan</button>
+                        </div>
+                        <table class="w-full text-left text-sm min-w-[400px]">
+                            <thead class="bg-gray-100 border-b border-gray-300">
+                                <tr><th class="p-3">URL / Domain</th><th class="p-3 text-right">Aksi</th></tr>
+                            </thead>
+                            <tbody id="url-list-body" class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="p-3 font-mono text-red-600">youtube.com</td>
+                                    <td class="p-3 text-right">
+                                        <button onclick="showToast('Menerapkan kebijakan ke semua PC...', 'info')" class="text-sky-600 hover:text-sky-800 mr-4 font-semibold"><i class="fa-solid fa-share-all"></i> Terapkan</button>
+                                        <button class="text-gray-500 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- VIEW D: FILE TRANSFER & RUN -->
+                <div id="view-filetrans" class="p-6 hidden">
+                    <h2 class="text-xl font-bold mb-4 text-gray-700"><i class="fa-solid fa-folder mr-2 text-sky-600"></i>Kirim File & Eksekusi</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left: File Drop -->
+                        <div class="bg-white border border-gray-300 rounded shadow-sm p-6">
+                            <h3 class="font-bold mb-3">1. Pilih File</h3>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center hover:bg-gray-50 transition cursor-pointer" onclick="document.getElementById('file-upload').click()">
+                                <i class="fa-solid fa-cloud-arrow-up text-5xl text-sky-500 mb-3"></i>
+                                <p class="text-gray-700 font-medium" id="file-name-display">Klik / Drop file disini</p>
+                                <input type="file" id="file-upload" class="hidden" onchange="document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : 'Klik / Drop file disini'">
+                            </div>
+                        </div>
+
+                        <!-- Right: Target & Mode -->
+                        <div class="bg-white border border-gray-300 rounded shadow-sm p-6 flex flex-col">
+                            <h3 class="font-bold mb-3">2. Target Pengiriman (Opsi Permintaan)</h3>
+                            
+                            <div class="mb-4 space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="tgt" value="1" onchange="toggleFileTarget()" checked class="accent-sky-600"> Kirim 1 User
+                                </label>
+                                <select id="file-target-list" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-sky-500 text-sm ml-6 mb-2" style="width: calc(100% - 1.5rem);">
+                                    <option value="PC-Andi">PC-Andi</option>
+                                    <option value="PC-Budi">PC-Budi</option>
+                                    <option value="PC-Admin">PC-Admin</option>
+                                </select>
+                                
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="tgt" value="selected" onchange="toggleFileTarget()" class="accent-sky-600"> Kirim Yang Dipilih (Checkbox di Grid/Tabel)
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="tgt" value="group" onchange="toggleFileTarget()" class="accent-sky-600"> Kirim Grup
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="tgt" value="all" onchange="toggleFileTarget()" class="accent-sky-600"> Kirim Semua
+                                </label>
+                            </div>
+
+                            <div class="flex gap-4 mb-6">
+                                <label class="flex-1 border border-gray-200 rounded p-3 cursor-pointer hover:border-sky-500">
+                                    <input type="radio" name="run_mode" value="save" class="accent-sky-600 mb-1" checked>
+                                    <div class="font-bold text-sm">Simpan Saja</div>
+                                </label>
+                                <label class="flex-1 border border-gray-200 rounded p-3 cursor-pointer hover:border-red-500">
+                                    <input type="radio" name="run_mode" value="run" class="accent-red-600 mb-1">
+                                    <div class="font-bold text-sm text-red-600">Langsung RUN!</div>
+                                </label>
+                            </div>
+
+                            <button id="btn-upload-run" onclick="uploadAndRun()" class="mt-auto w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded shadow">Kirim Sekarang</button>
+                            
+                            <!-- Progress Bar File -->
+                            <div id="upload-progress-container" class="hidden mt-4">
+                                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span id="upload-status-text">Mengunggah...</span>
+                                    <span id="upload-percent" class="font-bold text-sky-600">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-3">
+                                    <div id="upload-progress-bar" class="bg-sky-500 h-3 rounded-full transition-all duration-200" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL: QUICK LAUNCH (Buka Aplikasi)                                       -->
+    <!-- ========================================================================= -->
+    <div id="modal-quicklaunch" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-[500px] overflow-hidden">
+            <div class="bg-[#f0f0f0] border-b border-gray-300 px-4 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-gray-700"><i class="fa-solid fa-rocket text-red-500 mr-2"></i>Quick Launch (Buka Aplikasi)</h3>
+                <button onclick="document.getElementById('modal-quicklaunch').classList.add('hidden')" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Target Peluncuran:</label>
+                    <div class="flex gap-4 text-sm">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="ql_tgt" value="all" checked class="accent-sky-600"> Semua PC</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="ql_tgt" value="selected" class="accent-sky-600"> PC Terpilih (<span id="ql-target-count">0</span>)</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="ql_tgt" value="group" class="accent-sky-600"> Grup/Lab</label>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button onclick="document.getElementById('ql-input').value='chrome.exe'" class="border border-gray-300 rounded p-2 hover:bg-sky-50 flex flex-col items-center gap-1"><i class="fa-brands fa-chrome text-2xl text-blue-500"></i><span class="text-xs">Chrome</span></button>
+                    <button onclick="document.getElementById('ql-input').value='notepad.exe'" class="border border-gray-300 rounded p-2 hover:bg-sky-50 flex flex-col items-center gap-1"><i class="fa-solid fa-file-lines text-2xl text-gray-500"></i><span class="text-xs">Notepad</span></button>
+                    <button onclick="document.getElementById('ql-input').value='anydesk.exe'" class="border border-gray-300 rounded p-2 hover:bg-sky-50 flex flex-col items-center gap-1"><i class="fa-solid fa-desktop text-2xl text-red-500"></i><span class="text-xs">AnyDesk</span></button>
+                </div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Path/Nama Aplikasi/Perintah CMD:</label>
+                <input type="text" id="ql-input" placeholder="contoh: cmd /c ping 8.8.8.8" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-sky-500 font-mono text-sm mb-4">
+                
+                <div class="flex justify-end gap-2">
+                    <button onclick="document.getElementById('modal-quicklaunch').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded text-gray-600 hover:bg-gray-100">Batal</button>
+                    <button onclick="executeQuickLaunch()" class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 shadow font-bold">Luncurkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL: SEND MESSAGE                                                       -->
+    <!-- ========================================================================= -->
+    <div id="modal-message" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-[500px] overflow-hidden">
+            <div class="bg-[#f0f0f0] border-b border-gray-300 px-4 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-gray-700"><i class="fa-regular fa-envelope text-amber-500 mr-2"></i>Kirim Pesan ke User</h3>
+                <button onclick="document.getElementById('modal-message').classList.add('hidden')" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Penerima Pesan:</label>
+                    <div class="flex gap-4 text-sm">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="msg_tgt" value="all" checked class="accent-sky-600"> Semua PC</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="msg_tgt" value="selected" class="accent-sky-600"> PC Terpilih (<span id="msg-target-count">0</span>)</label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="msg_tgt" value="group" class="accent-sky-600"> Grup/Lab</label>
+                    </div>
+                </div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Isi Pesan:</label>
+                <textarea id="msg-input" rows="4" placeholder="Ketik pesan peringatan atau instruksi untuk user..." class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-amber-500 text-sm mb-4"></textarea>
+                
+                <div class="flex justify-end gap-2">
+                    <button onclick="document.getElementById('modal-message').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded text-gray-600 hover:bg-gray-100">Batal</button>
+                    <button onclick="executeSendMessage()" class="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-600 shadow font-bold"><i class="fa-solid fa-paper-plane mr-2"></i>Kirim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- MODAL: SET GROUP (Pindahkan PC ke Grup)                                   -->
+    <!-- ========================================================================= -->
+    <div id="modal-movegroup" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-[400px] overflow-hidden">
+            <div class="bg-[#f0f0f0] border-b border-gray-300 px-4 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-gray-700"><i class="fa-solid fa-users-gear text-violet-500 mr-2"></i>Pindahkan ke Grup (Lab)</h3>
+                <button onclick="document.getElementById('modal-movegroup').classList.add('hidden')" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4 text-sm bg-sky-50 border border-sky-200 text-sky-800 p-3 rounded">
+                    Anda akan memindahkan/mengatur grup untuk <span id="move-target-count" class="font-bold text-lg">0</span> PC terpilih.
+                </div>
+                
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Grup / Lab yang sudah ada:</label>
+                <select id="move-group-select" class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-violet-500 text-sm mb-4">
+                    <!-- Populated by JS -->
+                </select>
+
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="h-px bg-gray-300 flex-1"></div>
+                    <span class="text-xs text-gray-400 font-bold uppercase">ATAU BUAT BARU</span>
+                    <div class="h-px bg-gray-300 flex-1"></div>
+                </div>
+
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Grup Baru:</label>
+                <input type="text" id="move-group-new" placeholder="contoh: Lab 3 Jaringan..." class="w-full border border-gray-300 rounded px-3 py-2 outline-none focus:border-violet-500 text-sm mb-6">
+                
+                <div class="flex justify-end gap-2">
+                    <button onclick="document.getElementById('modal-movegroup').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded text-gray-600 hover:bg-gray-100">Batal</button>
+                    <button onclick="executeMoveGroup()" class="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700 shadow font-bold"><i class="fa-solid fa-check mr-2"></i>Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- OVERLAY: FULL MIRRORING (Remote Control)                                  -->
+    <!-- ========================================================================= -->
+    <div id="modal-mirror" class="hidden fixed inset-0 z-[60] bg-black flex flex-col">
+        <!-- Topbar Mirror -->
+        <div class="h-auto sm:h-12 bg-gray-900 border-b border-gray-800 flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 py-2 sm:py-0 gap-2 sm:gap-0">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                <span id="mirror-title" class="font-bold text-white">Live View: Target</span>
+            </div>
+            
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- 3 Macam Control Modes Sesuai Permintaan -->
+                <div class="bg-gray-800 rounded p-1 flex text-sm overflow-x-auto w-full sm:w-auto">
+                    <button id="btn-mode-view" onclick="setMirrorMode('view')" class="px-3 py-1 rounded bg-blue-600 text-white shadow whitespace-nowrap">View Only</button>
+                    <button id="btn-mode-share" onclick="setMirrorMode('share')" class="px-3 py-1 rounded text-gray-400 hover:text-white whitespace-nowrap">Share Control</button>
+                    <button id="btn-mode-total" onclick="setMirrorMode('total')" class="px-3 py-1 rounded text-gray-400 hover:text-white whitespace-nowrap" title="Kunci user, pegang kendali mutlak">Total Control</button>
+                </div>
+                <div class="hidden sm:block w-px h-6 bg-gray-700 mx-2"></div>
+                <button onclick="document.getElementById('modal-mirror').classList.add('hidden')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-bold ml-auto sm:ml-0">Tutup <i class="fa-solid fa-xmark ml-1"></i></button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden relative justify-center items-center">
+            
+            <!-- Notifikasi Keyboard Langsung -->
+            <div id="keyboard-indicator" class="hidden absolute top-4 bg-sky-600/90 text-white px-5 py-2 rounded-full text-sm font-bold backdrop-blur shadow-[0_5px_15px_rgba(0,0,0,0.5)] z-20 animate-pulse border border-sky-400">
+                <i class="fa-regular fa-keyboard mr-2"></i> Ketik Langsung di Keyboard Anda untuk Mengirim Input!
+            </div>
+
+            <!-- Canvas Area: Focusable untuk menangkap ketikan keyboard -->
+            <div id="mirror-screen" tabindex="0" class="relative bg-gray-800 mirror-cursor outline-none" style="aspect-ratio: 16/9; width: 90%; max-height: 90vh;" onclick="handleMirrorClick(event)" oncontextmenu="handleMirrorContextMenu(event)" onkeydown="handleMirrorKeyboard(event)">
+                <img id="mirror-img" src="https://placehold.co/1920x1080/1e293b/94a3b8?text=Connecting+to+Screen..." class="w-full h-full object-contain pointer-events-none shadow-2xl border border-gray-700">
+                
+                <div id="mirror-overlay" class="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none transition-opacity">
+                    <span id="overlay-text" class="bg-black/80 text-white px-4 py-2 rounded-full text-sm font-bold uppercase shadow-xl"><i class="fa-solid fa-eye mr-2"></i>View Only</span>
+                </div>
+            </div>
+            
+            <!-- Terminal Log (Kanan bawah) -->
+            <div class="absolute bottom-4 right-4 w-72 bg-black/80 backdrop-blur border border-gray-700 rounded-lg p-3 h-48 flex flex-col font-mono text-xs z-20 pointer-events-none">
+                <div class="text-green-400 font-bold mb-1 border-b border-gray-700 pb-1">S.A.S.T.R.O Live Log</div>
+                <div id="terminal-output" class="flex-1 overflow-y-auto text-gray-300 space-y-1"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER UNTUK NOTIFIKASI -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-[100] flex flex-col items-end pointer-events-none"></div>
+
+    <!-- ========================================================================= -->
+    <!-- JAVASCRIPT LOGIC                                                          -->
+    <!-- ========================================================================= -->
+    <script>
+        let currentRole = null; 
+        let mirrorMode = 'view';
+        let selectedPCs = new Set();
+        let currentDisplayMode = 'grid'; 
+        let currentGroupFilter = 'All'; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedRole = localStorage.getItem('sastro_role');
+            if (savedRole === 'admin') {
+                currentRole = 'admin';
+                document.getElementById('current-role-display').innerText = 'ADMIN IT';
+                navTo('page-dashboard');
+                renderGroupTabs();
+                renderPCGrid();
+            } else if (savedRole === 'client') {
+                currentRole = 'client';
+                navTo('page-client-standby');
+            } else if (savedRole === 'mandiri') {
+                currentRole = 'mandiri';
+                navTo('page-mandiri-dashboard');
+            } else {
+                navTo('page-pilihmode');
+            }
+        });
+
+        function verifyAndRedirectAdmin() {
+            const code = document.getElementById('admin-pair-verify').value.trim();
+            if(!code) {
+                showToast('Masukkan Pair Code terlebih dahulu!', 'warning');
+                return;
+            }
+            // Simulasi verifikasi pair code admin.html
+            showToast('Pair Code diverifikasi. Membuka admin.html...', 'success');
+            setTimeout(() => {
+                simulateLoading('admin', 'page-dashboard');
+            }, 800);
+        }
+
+        const dummyPCs = [
+            { id: 'PC1', name: 'PC-Andi', user: 'Andi', status: 'Online', ip: '192.168.1.10', mac: '00:1A:2B:3C:4D:5E', group: 'Lab 1' },
+            { id: 'PC2', name: 'PC-Budi', user: 'Budi', status: 'Online', ip: '192.168.1.11', mac: '00:1A:2B:3C:4D:5F', group: 'Lab 1' },
+            { id: 'PC3', name: 'Laptop-Siti', user: 'Siti', status: 'Online', ip: '192.168.1.12', mac: '00:1A:2B:3C:4D:60', group: 'Lab 2' },
+            { id: 'PC4', name: 'PC-Design-01', user: 'Design', status: 'Online', ip: '192.168.1.13', mac: '00:1A:2B:3C:4D:61', group: 'Lab 2' },
+            { id: 'PC5', name: 'PC-Kasir', user: 'Kasir', status: 'Offline', ip: '192.168.1.14', mac: '00:1A:2B:3C:4D:62', group: 'Office' },
+            { id: 'PC6', name: 'Server-Local', user: 'Admin', status: 'Online', ip: '192.168.1.15', mac: '00:1A:2B:3C:4D:63', group: 'Office' },
+        ];
+
+        // System Navigation
+        function navTo(pageId) {
+            document.querySelectorAll('.v-page').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Fungsi Keluar / Hapus Sesi
+        function logout() {
+            localStorage.removeItem('sastro_role');
+            currentRole = null;
+            navTo('page-pilihmode'); // Kembali ke Pilih Mode
+            showToast('Berhasil keluar. Sesi telah dihapus.', 'info');
+        }
+
+        // Loading simulation (Dimodifikasi untuk mendukung Role berbeda)
+        function simulateLoading(role, targetPage) {
+            currentRole = role;
+            
+            // SIMPAN KE MEMORY (LocalStorage)
+            localStorage.setItem('sastro_role', role);
+            
+            navTo('page-loadingshare');
+            
+            let progress = 0;
+            const bar = document.getElementById('loading-bar');
+            const txt = document.getElementById('loading-text');
+            
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 20) + 10;
+                if(progress > 100) progress = 100;
+                bar.style.width = progress + '%';
+                
+                if(progress > 50) txt.innerText = role === 'admin' ? "Menyiapkan Dashboard IT..." : "Menghubungkan layanan lokal...";
+                if(progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if(role === 'admin') {
+                            document.getElementById('current-role-display').innerText = 'ADMIN IT';
+                            navTo('page-dashboard');
+                            renderGroupTabs();
+                            renderPCGrid();
+                            showToast('Berhasil masuk ke Command Center.', 'success');
+                        } else {
+                            navTo(targetPage);
+                            showToast(`Sistem aktif dalam mode ${role.toUpperCase()}`, 'success');
+                        }
+                    }, 500);
+                }
+            }, 400);
+        }
+
+        // Dashboard View Switcher
+        function switchMainView(viewName) {
+            document.querySelectorAll('.side-icon').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            ['grid', 'list', 'inventory', 'appblock', 'webblock', 'filetrans'].forEach(v => {
+                const el = document.getElementById('view-' + v);
+                if(el) el.classList.add('hidden');
+            });
+            
+            // Handle grid/list internal switching
+            if (viewName === 'grid' || viewName === 'list') {
+                document.getElementById('view-' + currentDisplayMode).classList.remove('hidden');
+                document.querySelectorAll('.side-icon')[0].classList.add('active'); // tetap aktifkan icon home
+            } else {
+                document.getElementById('view-' + viewName).classList.remove('hidden');
+            }
+        }
+
+        function switchDisplayMode(mode) {
+            currentDisplayMode = mode;
+            
+            const btnGrid = document.getElementById('btn-disp-grid');
+            const btnList = document.getElementById('btn-disp-list');
+            
+            btnGrid.className = mode === 'grid' ? "px-3 py-1 rounded bg-white shadow-sm border border-gray-300 text-sky-600" : "px-3 py-1 rounded text-gray-500 hover:text-gray-800";
+            btnList.className = mode === 'list' ? "px-3 py-1 rounded bg-white shadow-sm border border-gray-300 text-sky-600" : "px-3 py-1 rounded text-gray-500 hover:text-gray-800";
+            
+            document.getElementById('view-grid').classList.add('hidden');
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-' + mode).classList.remove('hidden');
+        }
+
+        // --- TABS & FILTER LOGIC ---
+        function renderGroupTabs() {
+            const container = document.getElementById('group-tabs-container');
+            const groups = new Set(dummyPCs.map(pc => pc.group).filter(Boolean));
+            
+            const getBtnClass = (isActive) => isActive 
+                ? 'bg-white border-t border-l border-r border-gray-300 px-4 py-1.5 -mb-[1px] font-semibold text-gray-700 rounded-t shadow-[0_-2px_4px_rgba(0,0,0,0.02)]' 
+                : 'px-4 py-1.5 text-gray-500 hover:text-gray-800 transition-colors';
+            
+            let html = `<button onclick="filterByGroup('All')" class="${getBtnClass(currentGroupFilter === 'All')}">All Computers</button>`;
+            groups.forEach(g => {
+                html += `<button onclick="filterByGroup('${g}')" class="${getBtnClass(currentGroupFilter === g)}">${g}</button>`;
+            });
+            container.innerHTML = html;
+            
+            const moveSel = document.getElementById('move-group-select');
+            if(moveSel) {
+                moveSel.innerHTML = Array.from(groups).map(g => `<option value="${g}">${g}</option>`).join('');
+            }
+        }
+
+        function filterByGroup(group) {
+            currentGroupFilter = group;
+            selectedPCs.clear(); // Hapus seleksi saat pindah tab
+            renderGroupTabs();
+            renderPCGrid();
+        }
+
+        // --- GRID & SELECTION LOGIC ---
+        function renderPCGrid() {
+            const gridContainer = document.getElementById('pc-grid-container');
+            const listContainer = document.getElementById('pc-list-container');
+            gridContainer.innerHTML = '';
+            listContainer.innerHTML = '';
+            
+            const visiblePCs = dummyPCs.filter(pc => currentGroupFilter === 'All' || pc.group === currentGroupFilter);
+            
+            let allSelected = visiblePCs.length > 0 && selectedPCs.size === visiblePCs.length;
+            document.getElementById('chk-all').checked = allSelected;
+            const chkAllGrid = document.getElementById('chk-all-grid');
+            if(chkAllGrid) chkAllGrid.checked = allSelected;
+
+            const winImages = [
+                'https://images.unsplash.com/photo-1616077168712-fc6c788db4fa?q=80&w=320&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=320&auto=format&fit=crop',
+                'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=320&auto=format&fit=crop'
+            ];
+
+            visiblePCs.forEach((pc, idx) => {
+                const isOnline = pc.status === 'Online';
+                const imgSrc = isOnline ? winImages[idx % winImages.length] : 'https://placehold.co/320x180/000000/333333?text=Offline';
+                const isSelected = selectedPCs.has(pc.id);
+                
+                // RENDER GRID ITEM
+                const borderCls = isSelected ? 'border-sky-500 bg-sky-50 shadow-md' : 'border-gray-300 bg-white shadow-sm';
+                gridContainer.innerHTML += `
+                    <div id="card-${pc.id}" class="pc-card rounded-lg overflow-hidden border-2 ${borderCls} cursor-pointer hover:border-sky-400 group flex flex-col" 
+                         onclick="togglePCSelection('${pc.id}')" ondblclick="openMirror('${pc.name}')">
+                        
+                        <div class="relative w-full aspect-video bg-black p-1">
+                            <img src="${imgSrc}" class="w-full h-full object-cover rounded opacity-${isOnline ? '100' : '50'}">
+                            ${isSelected ? '<div class="absolute inset-0 border-[3px] border-sky-500 z-10 m-1 rounded"></div>' : ''}
+                        </div>
+                        
+                        <div class="p-2 text-center flex-1 flex flex-col justify-center bg-inherit">
+                            <div class="font-bold text-gray-800 text-sm truncate">${pc.name}</div>
+                            <div class="text-xs text-gray-500 flex items-center justify-center gap-1 mt-1">
+                                <div class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div> ${pc.status}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // RENDER LIST ITEM
+                const rowBg = isSelected ? 'bg-sky-50' : 'hover:bg-gray-50';
+                listContainer.innerHTML += `
+                    <tr class="${rowBg} cursor-pointer transition-colors" onclick="togglePCSelection('${pc.id}')">
+                        <td class="p-3 text-center" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="togglePCSelection('${pc.id}')" class="accent-sky-600 w-4 h-4">
+                        </td>
+                        <td class="p-3 font-semibold text-gray-800"><i class="fa-solid fa-desktop text-gray-400 mr-2"></i>${pc.name}</td>
+                        <td class="p-3 text-gray-600">${pc.user}</td>
+                        <td class="p-3 font-medium ${isOnline ? 'text-green-600' : 'text-gray-500'}">
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div> ${pc.status}</div>
+                        </td>
+                        <td class="p-3 font-mono text-xs text-gray-600">${pc.ip}</td>
+                        <td class="p-3 font-mono text-xs text-gray-600">${pc.mac}</td>
+                        <td class="p-3 text-right">
+                            <button onclick="event.stopPropagation(); openMirror('${pc.name}')" class="px-3 py-1 bg-sky-100 hover:bg-sky-200 text-sky-700 rounded text-xs font-bold transition">Watch</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            updateToolbarStatus();
+        }
+
+        function togglePCSelection(id) {
+            if(selectedPCs.has(id)) selectedPCs.delete(id);
+            else selectedPCs.add(id);
+            renderPCGrid(); // re-render to update classes in both views
+        }
+        
+        function toggleAllPC(checked) {
+            const visiblePCs = dummyPCs.filter(pc => currentGroupFilter === 'All' || pc.group === currentGroupFilter);
+            if(checked) {
+                visiblePCs.forEach(pc => selectedPCs.add(pc.id));
+            } else {
+                selectedPCs.clear();
+            }
+            renderPCGrid();
+        }
+
+        function updateToolbarStatus() {
+            const count = selectedPCs.size;
+            document.getElementById('ql-target-count').innerText = count;
+            const msgCount = document.getElementById('msg-target-count');
+            if(msgCount) msgCount.innerText = count;
+        }
+
+        // --- BULK ACTIONS (Top Toolbar) ---
+        function bulkAction(action) {
+            const count = selectedPCs.size;
+            const target = count === 0 ? "SEMUA PC" : `${count} PC`;
+            
+            if(action === 'file') {
+                switchMainView('filetrans');
+                // update sidebar icon
+                document.querySelectorAll('.side-icon').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.side-icon')[4].classList.add('active');
+                return;
+            }
+            if(action === 'message') {
+                document.getElementById('modal-message').classList.remove('hidden');
+                return;
+            }
+            if(action === 'move_group') {
+                if(count === 0) {
+                    showToast('Pilih minimal 1 PC dari Grid/Tabel untuk dipindahkan grupnya.', 'warning');
+                    return;
+                }
+                document.getElementById('move-target-count').innerText = count;
+                document.getElementById('modal-movegroup').classList.remove('hidden');
+                return;
+            }
+            
+            let actionName = "";
+            if(action === 'lock') actionName = "Mengunci Layar";
+            if(action === 'unlock') actionName = "Membuka Kunci Layar";
+            if(action === 'blank') actionName = "Membuat Layar Blank";
+            if(action === 'shutdown') actionName = "Mematikan (Shutdown)";
+            if(action === 'poweron') actionName = "Mengirim Magic Packet Wake-on-LAN (Power On)";
+            if(action === 'restart') actionName = "Merestart PC";
+
+            showToast(`${actionName} ke ${target}...`, 'info');
+        }
+
+        function openQuickLaunchModal() {
+            document.getElementById('modal-quicklaunch').classList.remove('hidden');
+        }
+
+        function executeQuickLaunch() {
+            const cmd = document.getElementById('ql-input').value;
+            if(!cmd) return;
+            
+            const tgtRadio = document.querySelector('input[name="ql_tgt"]:checked').value;
+            let targetName = "SEMUA PC";
+            if(tgtRadio === 'selected') targetName = `${selectedPCs.size} PC Terpilih`;
+            if(tgtRadio === 'group') targetName = "Grup/Lab Aktif";
+
+            document.getElementById('modal-quicklaunch').classList.add('hidden');
+            showToast(`Memerintahkan ${targetName} untuk membuka: ${cmd}`, 'success');
+        }
+
+        function executeSendMessage() {
+            const msg = document.getElementById('msg-input').value;
+            if(!msg) return;
+            
+            const tgtRadio = document.querySelector('input[name="msg_tgt"]:checked').value;
+            let targetName = "SEMUA PC";
+            if(tgtRadio === 'selected') targetName = `${selectedPCs.size} PC Terpilih`;
+            if(tgtRadio === 'group') targetName = "Grup/Lab Aktif";
+
+            document.getElementById('modal-message').classList.add('hidden');
+            document.getElementById('msg-input').value = '';
+            showToast(`Pesan terkirim ke ${targetName}: "${msg}"`, 'success');
+        }
+
+        function executeMoveGroup() {
+            const selGroup = document.getElementById('move-group-select').value;
+            const newGroup = document.getElementById('move-group-new').value.trim();
+            const finalGroup = newGroup !== "" ? newGroup : selGroup;
+            
+            // Ubah grup di data dummy secara real-time
+            dummyPCs.forEach(pc => {
+                if(selectedPCs.has(pc.id)) {
+                    pc.group = finalGroup;
+                }
+            });
+            
+            document.getElementById('modal-movegroup').classList.add('hidden');
+            document.getElementById('move-group-new').value = ''; // reset input
+            
+            showToast(`${selectedPCs.size} PC berhasil ditugaskan ke grup: ${finalGroup}`, 'success');
+            
+            // Uncheck semua pilihan setelah berhasil memindahkan
+            selectedPCs.clear();
+            renderGroupTabs(); // Render ulang tabs jika ada grup baru
+            renderPCGrid();
+        }
+
+        function openSelectedMirror() {
+            if(selectedPCs.size === 0) {
+                showToast('Pilih minimal 1 PC dari grid untuk dilihat (Watch).', 'warning');
+                return;
+            }
+            // Ambil nama PC pertama yang dipilih
+            const firstId = Array.from(selectedPCs)[0];
+            const pc = dummyPCs.find(p => p.id === firstId);
+            openMirror(pc.name);
+        }
+
+        // --- MIRRORING & REMOTE CONTROL ---
+        function openMirror(pcName) {
+            document.getElementById('mirror-title').innerText = `Live View: ${pcName}`;
+            document.getElementById('modal-mirror').classList.remove('hidden');
+            document.getElementById('terminal-output').innerHTML = '';
+            setMirrorMode(currentRole === 'admin' ? 'total' : 'view');
+            
+            // Random screen load
+            const img = document.getElementById('mirror-img');
+            img.src = `https://placehold.co/1920x1080/1e293b/94a3b8?text=Live+Desktop:+${pcName}`;
+            
+            // Auto focus canvas untuk keyboard
+            setTimeout(() => document.getElementById('mirror-screen').focus(), 100);
+        }
+
+        function setMirrorMode(mode) {
+            mirrorMode = mode;
+            const btns = ['view', 'share', 'total'].map(id => document.getElementById('btn-mode-' + id));
+            const overlay = document.getElementById('mirror-overlay');
+            const overlayText = document.getElementById('overlay-text');
+            const screen = document.getElementById('mirror-screen');
+            const kbdInd = document.getElementById('keyboard-indicator');
+
+            btns.forEach(btn => btn.className = "px-3 py-1 rounded text-gray-400 hover:text-white");
+
+            if(mode === 'view') {
+                btns[0].className = "px-3 py-1 rounded bg-blue-600 text-white shadow";
+                overlay.style.opacity = '1';
+                overlayText.innerHTML = '<i class="fa-solid fa-eye mr-2"></i>View Only Mode';
+                overlayText.className = "bg-black/80 text-white px-4 py-2 rounded-full text-sm font-bold uppercase shadow-xl";
+                screen.style.cursor = 'default';
+                kbdInd.classList.add('hidden');
+            } else if (mode === 'share') {
+                btns[1].className = "px-3 py-1 rounded bg-sky-600 text-white shadow";
+                overlay.style.opacity = '0';
+                screen.style.cursor = 'crosshair';
+                kbdInd.classList.remove('hidden');
+                showToast('Share Control: Admin & User dapat mengendalikan mouse/keyboard.', 'info');
+                screen.focus();
+            } else if (mode === 'total') {
+                btns[2].className = "px-3 py-1 rounded bg-red-600 text-white shadow";
+                overlay.style.opacity = '1';
+                overlay.style.backgroundColor = 'rgba(220, 38, 38, 0.15)'; 
+                overlayText.innerHTML = '<i class="fa-solid fa-lock mr-2"></i>User Locked (Total Control)';
+                overlayText.className = "bg-red-800 text-white border border-red-500 px-4 py-2 rounded-full text-sm font-bold shadow-xl";
+                
+                screen.style.cursor = 'crosshair';
+                kbdInd.classList.remove('hidden');
+                showToast('Total Control: User dikunci dari PC-nya, Admin pegang kendali mutlak!', 'warning');
+                
+                setTimeout(() => { overlay.style.opacity = '0'; }, 2000); // fade out text overlay
+                screen.focus();
+            }
+        }
+
+        function handleMirrorClick(e) {
+            if(mirrorMode === 'view') return;
+            e.currentTarget.focus(); // Pastikan fokus untuk keyboard
+            
+            // Blokir fungsi default browser pada event click untuk amannya
+            e.preventDefault();
+            
+            const rect = e.target.getBoundingClientRect();
+            const x = Math.round(((e.clientX - rect.left) / rect.width) * 1920); 
+            const y = Math.round(((e.clientY - rect.top) / rect.height) * 1080);
+            
+            logTerminal(`> Mouse Click {X:${x}, Y:${y}} via user32.dll`);
+        }
+        
+        function handleMirrorContextMenu(e) {
+            // Hilangkan menu klik kanan browser sama sekali
+            e.preventDefault();
+            if(mirrorMode === 'view') return;
+            
+            e.currentTarget.focus();
+            const rect = e.target.getBoundingClientRect();
+            const x = Math.round(((e.clientX - rect.left) / rect.width) * 1920); 
+            const y = Math.round(((e.clientY - rect.top) / rect.height) * 1080);
+            
+            logTerminal(`> Right-Click {X:${x}, Y:${y}} via user32.dll`);
+        }
+
+        function handleMirrorKeyboard(e) {
+            if(mirrorMode === 'view') return;
+            
+            // Blokir fungsi default shortcut browser (scroll dengan spasi/panah, refresh F5, dll)
+            e.preventDefault(); 
+            
+            let key = e.key;
+            if(key === 'Enter') key = '{ENTER}';
+            else if(key === 'Backspace') key = '{BACKSPACE}';
+            else if(key === 'Escape') key = '{ESC}';
+            else if(key === ' ') key = '{SPACE}';
+
+            logTerminal(`> SendKey: <span class="text-yellow-400 font-bold">${key}</span>`);
+        }
+
+        function logTerminal(msg) {
+            const term = document.getElementById('terminal-output');
+            term.innerHTML += `<div>${msg}</div>`;
+            term.scrollTop = term.scrollHeight;
+        }
+
+        // --- FILE TRANSFER & OTHERS ---
+        function toggleFileTarget() {
+            const val = document.querySelector('input[name="tgt"]:checked').value;
+            document.getElementById('file-target-list').disabled = (val !== '1');
+            if(val !== '1') document.getElementById('file-target-list').style.opacity = '0.5';
+            else document.getElementById('file-target-list').style.opacity = '1';
+        }
+
+        function uploadAndRun() {
+            const fileInput = document.getElementById('file-upload');
+            const tgtRadio = document.querySelector('input[name="tgt"]:checked').value;
+            const runMode = document.querySelector('input[name="run_mode"]:checked').value;
+            
+            let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "update_patch.exe";
+            let targetName = "";
+            
+            if(tgtRadio === 'all') targetName = "Semua PC";
+            else if(tgtRadio === 'group') targetName = "Grup PC saat ini";
+            else if(tgtRadio === 'selected') targetName = `${selectedPCs.size} PC yang dicentang`;
+            else targetName = document.getElementById('file-target-list').value;
+            
+            const btn = document.getElementById('btn-upload-run');
+            const container = document.getElementById('upload-progress-container');
+            const bar = document.getElementById('upload-progress-bar');
+            const percent = document.getElementById('upload-percent');
+            
+            btn.disabled = true; btn.classList.replace('bg-sky-600', 'bg-gray-400');
+            container.classList.remove('hidden');
+            
+            let p = 0;
+            const int = setInterval(() => {
+                p += Math.floor(Math.random() * 20) + 10;
+                if(p > 100) p = 100;
+                bar.style.width = p + '%';
+                percent.innerText = p + '%';
+                
+                if(p === 100) {
+                    clearInterval(int);
+                    setTimeout(() => {
+                        btn.disabled = false; btn.classList.replace('bg-gray-400', 'bg-sky-600');
+                        container.classList.add('hidden');
+                        bar.style.width = '0%';
+                        
+                        let savePath = `C:\\Users\\Public\\Downloads\\${fileName}`;
+                        if(runMode === 'run') {
+                            showToast(`Berhasil upload ke ${targetName}. File ${fileName} dieksekusi secara remote!`, 'success');
+                        } else {
+                            showToast(`File dikirim ke ${targetName} dan disimpan di: ${savePath}`, 'success');
+                        }
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function addList(type) {
+            const input = document.getElementById(type === 'url' ? 'input-block-url' : 'input-block-app');
+            const val = input.value.trim();
+            if(!val) return;
+
+            const tbody = document.getElementById(type === 'url' ? 'url-list-body' : 'app-list-body');
+            tbody.innerHTML += `
+                <tr>
+                    <td class="p-3 font-mono text-red-600">${val}</td>
+                    <td class="p-3 text-right">
+                        ${type === 'url' ? `<button onclick="showToast('Menerapkan ke semua PC...', 'info')" class="text-sky-600 hover:text-sky-800 mr-4 font-semibold"><i class="fa-solid fa-share-all"></i> Terapkan</button>` : ''}
+                        <button onclick="this.closest('tr').remove()" class="text-gray-500 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            input.value = '';
+            showToast(`${val} ditambahkan ke daftar.`, 'success');
+        }
+
+        function triggerBlockedDemo() { navTo('page-bloked'); }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let border = 'border-blue-500';
+            let icon = '<i class="fa-solid fa-circle-info text-blue-500 text-xl"></i>';
+            if(type === 'success') { border = 'border-green-500'; icon = '<i class="fa-solid fa-circle-check text-green-500 text-xl"></i>'; }
+            if(type === 'error') { border = 'border-red-500'; icon = '<i class="fa-solid fa-circle-xmark text-red-500 text-xl"></i>'; }
+            if(type === 'warning') { border = 'border-yellow-500'; icon = '<i class="fa-solid fa-triangle-exclamation text-yellow-500 text-xl"></i>'; }
+
+            toast.className = `flex items-center gap-3 p-4 rounded shadow-lg border-l-4 ${border} bg-white min-w-[300px] mb-2 transform transition-all duration-300 translate-x-full opacity-0 pointer-events-auto`;
+            toast.innerHTML = `${icon} <span class="text-sm font-semibold text-gray-700 flex-1">${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Slide in
+            requestAnimationFrame(() => { toast.classList.remove('translate-x-full', 'opacity-0'); });
+
+            // Slide out
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
